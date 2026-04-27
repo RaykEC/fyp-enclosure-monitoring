@@ -1,0 +1,118 @@
+##PostSQL installation guide:
+Step 3.1: Download and Install PostgreSQL
+
+Go to: https://www.postgresql.org/download/windows/
+Click "Download the installer" (it takes you to EDB's site)
+Download the latest PostgreSQL 17.x for Windows x86-64
+
+Run the installer with these settings:
+During installation, it will ask you a few things:
+Installation directory: Leave as default
+Components: Keep all checked (PostgreSQL Server, pgAdmin 4, Stack Builder, Command Line Tools)
+Data directory: Leave as default
+Superuser password: Choose something you'll remember — this is the password for the postgres user (the admin account). Write it down. Something like fyp2026 is fine for development
+Port: Leave as default 5432
+Locale: Leave as default
+Stack Builder: You can uncheck/skip this at the end — we don't need it
+
+add environment variable -> at advance settings:
+C:\Program Files\PostgreSQL\17\bin
+
+type psql --version in CMD to check for version.
+
+#change password
+ALTER USER postgres WITH PASSWORD 'your_new_password';
+
+#To login, then type password
+psql -U postgres
+
+#to exit
+\q
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+#SQL Table,  panels, sensor_monitoring, alert creation.
+
+
+CREATE TABLE panels (
+    panel_id INTEGER PRIMARY KEY,
+    panel_name VARCHAR(100) NOT NULL,
+    location VARCHAR(200),
+    status VARCHAR(20) DEFAULT 'offline',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_seen TIMESTAMP
+);
+
+
+
+
+
+CREATE TABLE sensor_readings (reading_id SERIAL PRIMARY KEY, panel_id INTEGER REFERENCES panels(panel_id), temperature REAL, humidity REAL, door_status VARCHAR(20), fan_status VARCHAR(20), alarm_status VARCHAR(20), recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+
+
+CREATE TABLE alerts (
+    alert_id SERIAL PRIMARY KEY,
+    panel_id INTEGER REFERENCES panels(panel_id),
+    alert_type VARCHAR(50) NOT NULL,
+    severity VARCHAR(20) NOT NULL,
+    message VARCHAR(500),
+    acknowledged BOOLEAN DEFAULT FALSE,
+    triggered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+
+
+
+#add panel
+
+INSERT INTO panels (panel_id, panel_name, location, status) VALUES
+(1, 'Panel 1', 'Physical ESP32', 'offline'),
+(2, 'Panel 2', 'Simulated', 'offline'),
+(3, 'Panel 3', 'Simulated', 'offline'),
+(4, 'Panel 4', 'Simulated', 'offline'),
+(5, 'Panel 5', 'Simulated', 'offline'),
+(6, 'Panel 6', 'Simulated', 'offline'),
+(7, 'Panel 7', 'Simulated', 'offline'),
+(8, 'Panel 8', 'Simulated', 'offline'),
+(9, 'Panel 9', 'Simulated', 'offline'),
+(10, 'Panel 10', 'Simulated', 'offline');
+
+
+
+#to select those status
+SELECT panel_id, panel_name, status FROM panels;
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#SQL Schema
+
+fyp_monitoring database
+├── panels (10 columns)
+│   ├── Identity:    panel_id, panel_name, location
+│   ├── Lifecycle:   status, created_at, last_seen
+│   └── Live state:  current_temperature, current_humidity,
+│                    current_door_status, current_fan_status,
+│                    current_alarm_status
+│
+├── sensor_readings (8 columns)
+│   └── Append-only history → for trend charts and predictive maintenance
+│
+└── alerts (7 columns)
+    └── Append-only event log → for dashboard notifications
+
+
+
+
+
+
+\dt — list tables
+\du — list users (roles)
+\d <tablename> — describe a specific table
+\c <database> — connect to a database
+\l — list databases
+\q — quit
+
+
+
+

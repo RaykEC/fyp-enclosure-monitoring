@@ -1,0 +1,46 @@
+#Testing to check whether there is a handshake or connection established.
+#1st CMD
+mosquitto -c "C:\Program Files\mosquitto\mosquitto.conf" -v
+
+#2nd CMD, to test
+mosquitto_sub -h 192.168.100.2 -t "test/topic" -u esp32_panel -P test
+
+mosquitto_pub -h 192.168.100.2 -t "test/topic" -m "Hello from Edwin" -u esp32_panel -P test
+----------------------------------------------------------------------------------------------------------
+#To reset Mosquitto Passwd for backend_server or esp32_panel
+mosquitto_passwd "C:\Program Files\mosquitto\passwd" backend_server
+
+#Create password and username from stretch, -c is used to create from stretch.
+mosquitto_passwd -c "C:\Program Files\mosquitto\passwd" username
+
+---------------------------------------------------------------------------------------------------
+
+#Activate MQTT in CMD under Run as admin:
+mosquitto -c "C:\Program Files\mosquitto\mosquitto.conf" -v
+
+#for activating Venv in CMD under Run as admin:
+cd C:\Users\Admin\Downloads\Project_MQTT\FYP\FYP_Backend
+venv\Scripts\activate
+
+#running it in (venv) command prompt
+python mqtt_subscriber.py
+	
+superuse passwd: test
+
+
+---------------------------------------------------------------------------------------------------
+#Running PostgreSQL:
+#change to English first.
+
+set LC_MESSAGES=C
+
+psql -U postgres
+\c fyp_monitoring
+
+\dt
+
+---------------------------------------------------------------------------------------------------
+#for Testing data flow and Restapi
+
+http://192.168.100.2:8000/panels
+http://192.168.100.2:8000/docs
