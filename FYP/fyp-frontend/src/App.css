@@ -67,3 +67,127 @@
   background-color: #f5f5f5;
   overflow-y: auto;
 }
+
+/* ── Panel Detail ── */
+.panel-detail {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.panel-header h1 {
+  font-size: 24px;
+  margin: 0;
+}
+
+.panel-location {
+  color: #888;
+  font-size: 14px;
+}
+
+.panel-body {
+  display: flex;
+  gap: 24px;
+  margin-top: 20px;
+  flex: 1;
+}
+
+.chart-area {
+  flex: 1;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.info-area {
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Status Info ── */
+.status-info {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #ddd;
+}
+
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.status-row:last-child {
+  border-bottom: none;
+}
+
+.status-label {
+  font-weight: bold;
+  font-size: 14px;
+  color: #555;
+}
+
+.status-value {
+  font-size: 14px;
+}
+
+.status-value.warning {
+  color: #ff9800;
+  font-weight: bold;
+}
+
+.status-value.critical {
+  color: #f44336;
+  font-weight: bold;
+}
+
+/* ── Action Buttons ── */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-logs {
+  background-color: #1a1a2e;
+  color: #ffffff;
+}
+
+.btn-logs:hover {
+  background-color: #16213e;
+}
+
+.btn-reboot {
+  background-color: #f44336;
+  color: #ffffff;
+}
+
+.btn-reboot:hover {
+  background-color: #d32f2f;
+}
