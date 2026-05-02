@@ -1,5 +1,7 @@
 # Region 1 — Imports
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from contextlib import asynccontextmanager
 import paho.mqtt.client as mqtt
 import psycopg2
@@ -7,6 +9,8 @@ import psycopg2.extras
 import json
 from datetime import datetime, timedelta
 import threading
+import csv
+import io
 
 # Region 2 — Configuration constants
 MQTT_BROKER = "192.168.100.2"
@@ -177,6 +181,14 @@ async def lifespan(app):
 
 app = FastAPI(lifespan=lifespan)
 
+# CORS — allow React dev server to call this API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Region 6 — REST endpoints
 
 @app.get("/panels")
@@ -238,6 +250,85 @@ def reset_panel(panel_id: int):
     topic = f"panel/{panel_id}/control/reset"
     mqtt_client.publish(topic, "RESET")
     return {"message": f"Reset command sent to panel {panel_id}"}
+
+
+@app.get("/panels/{panel_id}/export/readings")
+def export_readings(panel_id: int, from_date: str = ""):
+    # Validate date format
+    if not from_date or len(from_date) != 8:
+        raise HTTPException(status_code=400, detail="Please enter a valid value (YYYYMMDD)")
+    try:
+        start_date = datetime.strptime(from_date, "%Y%m%d")
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Please enter a valid value (YYYYMMDD)")
+
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute(
+        """SELECT recorded_at, temperature, humidity 
+           FROM sensor_readings 
+           WHERE panel_id = %s AND recorded_at >= %s 
+             AND (temperature IS NOT NULL OR humidity IS NOT NULL)
+           ORDER BY recorded_at ASC""",
+        (panel_id, start_date)
+    )
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    # Build CSV in memory
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["timestamp", "temperature", "humidity"])
+    for row in rows:
+        writer.writerow([row["recorded_at"], row["temperature"], row["humidity"]])
+
+    output.seek(0)
+    filename = f"panel_{panel_id}_readings_{from_date}.csv"
+    return StreamingResponse(
+        output,
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
+
+@app.get("/panels/{panel_id}/export/alerts")
+def export_alerts(panel_id: int, from_date: str = ""):
+    # Validate date format
+    if not from_date or len(from_date) != 8:
+        raise HTTPException(status_code=400, detail="Please enter a valid value (YYYYMMDD)")
+    try:
+        start_date = datetime.strptime(from_date, "%Y%m%d")
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Please enter a valid value (YYYYMMDD)")
+
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute(
+        """SELECT triggered_at, alert_type, severity, message, acknowledged 
+           FROM alerts 
+           WHERE panel_id = %s AND triggered_at >= %s 
+           ORDER BY triggered_at ASC""",
+        (panel_id, start_date)
+    )
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    # Build CSV in memory
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["timestamp", "alert_type", "severity", "message", "acknowledged"])
+    for row in rows:
+        writer.writerow([row["triggered_at"], row["alert_type"], row["severity"], row["message"], row["acknowledged"]])
+
+    output.seek(0)
+    filename = f"panel_{panel_id}_alerts_{from_date}.csv"
+    return StreamingResponse(
+        output,
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
 
 # Region 7 — Direct-run block
 if __name__ == "__main__":
