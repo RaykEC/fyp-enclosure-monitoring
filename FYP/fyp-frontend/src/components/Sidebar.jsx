@@ -1,4 +1,12 @@
 function Sidebar({ panels, selectedPanel, onSelectPanel }) {
+
+  function isOnline(lastSeen) {
+    if (!lastSeen) return false;
+    const now = new Date();
+    const seen = new Date(lastSeen);
+    return (now - seen) < 15000;
+  }
+
   return (
     <div className="sidebar">
       <h2>Panels</h2>
@@ -10,7 +18,7 @@ function Sidebar({ panels, selectedPanel, onSelectPanel }) {
             onClick={() => onSelectPanel(panel.panel_id)}
           >
             <span
-              className={`status-dot ${panel.status === "online" ? "online" : "offline"}`}
+              className={`status-dot ${isOnline(panel.last_seen) ? "online" : "offline"}`}
             ></span>
             <span className="panel-name">Panel {panel.panel_id}</span>
           </div>
