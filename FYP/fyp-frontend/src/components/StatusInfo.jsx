@@ -6,6 +6,32 @@ function StatusInfo({ panel }) {
     return new Date(timestamp).toLocaleString();
   }
 
+  function tempClass(temp) {
+    if (temp === null) return "";
+    if (temp >= 75) return "critical";
+    if (temp >= 45) return "warning";
+    return "";
+  }
+
+  function doorClass(status) {
+    if (!status) return "";
+    if (status === "TIMEOUT" || status === "WRONG_CODE") return "critical";
+    if (status === "OPEN") return "warning";
+    return "";
+  }
+
+  function fanClass(status) {
+    if (status === "ON") return "warning";
+    return "";
+  }
+
+  function alarmClass(status) {
+    if (!status) return "";
+    if (status === "CRITICAL_TEMP" || status === "WRONG_CODE") return "critical";
+    if (status === "TIMEOUT" || status === "TEMP_ACKED") return "warning";
+    return "";
+  }
+
   return (
     <div className="status-info">
       <div className="status-row">
@@ -15,7 +41,7 @@ function StatusInfo({ panel }) {
 
       <div className="status-row">
         <span className="status-label">Temperature</span>
-        <span className="status-value">
+        <span className={`status-value ${tempClass(panel.current_temperature)}`}>
           {panel.current_temperature !== null
             ? `${panel.current_temperature}°C`
             : "—"}
@@ -33,28 +59,21 @@ function StatusInfo({ panel }) {
 
       <div className="status-row">
         <span className="status-label">Door</span>
-        <span className={`status-value ${panel.current_door_status === "OPEN" ? "warning" : ""}`}>
+        <span className={`status-value ${doorClass(panel.current_door_status)}`}>
           {panel.current_door_status || "—"}
         </span>
       </div>
 
       <div className="status-row">
         <span className="status-label">Fan</span>
-        <span className="status-value">
+        <span className={`status-value ${fanClass(panel.current_fan_status)}`}>
           {panel.current_fan_status || "—"}
         </span>
       </div>
 
       <div className="status-row">
         <span className="status-label">Alarm</span>
-        <span className={`status-value ${
-          panel.current_alarm_status === "CRITICAL_TEMP" ||
-          panel.current_alarm_status === "WRONG_CODE"
-            ? "critical"
-            : panel.current_alarm_status === "TIMEOUT"
-            ? "warning"
-            : ""
-        }`}>
+        <span className={`status-value ${alarmClass(panel.current_alarm_status)}`}>
           {panel.current_alarm_status || "—"}
         </span>
       </div>

@@ -1,14 +1,28 @@
 import { useState, useEffect } from "react";
 import StatusInfo from "./StatusInfo";
-import { fetchPanel, sendReset } from "../services/api";
+import SensorChart from "./SensorChart";
+import LogsModal from "./LogsModal";
+import { fetchPanel, fetchHistory, sendReset } from "../services/api";
 
 function PanelDetail({ selectedPanel }) {
   const [panel, setPanel] = useState(null);
+  const [history, setHistory] = useState([]);
+  const [showLogs, setShowLogs] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch panel data on selection change + poll every 5 seconds
   useEffect(() => {
+    setLoading(true); /*ELSn warning not a bug */
 
-    fetchPanel(selectedPanel).then((data) => setPanel(data));
+    Promise.all([
+      fetchPanel(selectedPanel),
+      fetchHistory(selectedPanel, 720),
+    ]).then(([panelData, historyData]) => {
+      setPanel(panelData);
+      setHistory(historyData);
+      setLoading(false);
+    }).catch(() => {
+      setLoading(false);
+    });
 
     const interval = setInterval(() => {
       fetchPanel(selectedPanel).then((data) => setPanel(data));
@@ -30,6 +44,14 @@ function PanelDetail({ selectedPanel }) {
     }
   }
 
+  if (loading) {
+    return (
+      <div className="panel-detail">
+        <p className="loading-text">Loading Panel {selectedPanel}...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="panel-detail">
       <div className="panel-header">
@@ -40,14 +62,14 @@ function PanelDetail({ selectedPanel }) {
 
       <div className="panel-body">
         <div className="chart-area">
-          <p>Chart goes here (sub-step 5.5)</p>
+          <SensorChart history={history} />
         </div>
 
         <div className="info-area">
           <StatusInfo panel={panel} />
 
           <div className="action-buttons">
-            <button className="btn btn-logs" onClick={() => alert("Logs modal coming in sub-step 5.7")}>
+            <button className="btn btn-logs" onClick={() => setShowLogs(true)}>
               Logs
             </button>
             <button className="btn btn-reboot" onClick={handleReboot}>
@@ -56,6 +78,13 @@ function PanelDetail({ selectedPanel }) {
           </div>
         </div>
       </div>
+
+      {showLogs && (
+        <LogsModal
+          panelId={selectedPanel}
+          onClose={() => setShowLogs(false)}
+        />
+      )}
     </div>
   );
 }

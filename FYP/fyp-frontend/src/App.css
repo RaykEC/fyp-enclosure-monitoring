@@ -1,7 +1,56 @@
+/* ── Title Bar ── */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #1a1a2e;
+  color: #ffffff;
+  padding: 12px 24px;
+  border-bottom: 2px solid #0f3460;
+}
+
+.title-bar-name {
+  font-size: 18px;
+  margin: 0;
+  font-weight: 600;
+}
+
+.title-bar-info {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-size: 14px;
+}
+
+.title-bar-panels {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.online-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #4caf50;
+  display: inline-block;
+}
+
+.title-bar-clock {
+  color: #aaa;
+}
+
 /* ── App Layout ── */
 .app-layout {
   display: flex;
-  height: 100vh;
+  flex: 1;
+  overflow: hidden;
 }
 
 /* ── Sidebar ── */
@@ -63,6 +112,7 @@
 /* ── Main Content ── */
 .main-content {
   flex: 1;
+  min-width: 0;
   padding: 24px;
   background-color: #f5f5f5;
   overflow-y: auto;
@@ -190,4 +240,145 @@
 
 .btn-reboot:hover {
   background-color: #d32f2f;
+}
+
+/* ── Chart ── */
+.chart-container {
+  width: 100%;
+  height: 100%;
+}
+
+.chart-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #888;
+}
+
+/* ── Modal ── */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal-content {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 24px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-content h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modal-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #555;
+}
+
+.modal-select,
+.modal-input {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.modal-hint {
+  font-size: 12px;
+  color: #888;
+}
+
+.modal-error {
+  color: #f44336;
+  font-size: 14px;
+  margin: 0;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-submit {
+  background-color: #4caf50;
+  color: #ffffff;
+}
+
+.btn-submit:hover {
+  background-color: #43a047;
+}
+
+.btn-cancel {
+  background-color: #888;
+  color: #ffffff;
+}
+
+.btn-cancel:hover {
+  background-color: #666;
+}
+
+/* ── Error Banner ── */
+.error-banner {
+  background-color: #f44336;
+  color: #ffffff;
+  text-align: center;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* ── Loading ── */
+.loading-text {
+  color: #888;
+  font-size: 16px;
+  padding: 40px 0;
+}
+
+/* ── Responsive — basic safety net ── */
+@media (max-width: 768px) {
+  .app-layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    max-height: 120px;
+    overflow-y: auto;
+  }
+
+  .panel-body {
+    flex-direction: column;
+  }
+
+  .info-area {
+    width: 100%;
+  }
+
+  .title-bar {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
 }
