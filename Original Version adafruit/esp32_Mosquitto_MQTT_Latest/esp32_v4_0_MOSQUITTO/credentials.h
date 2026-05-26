@@ -45,6 +45,7 @@
 
 // Control topics (for future two-way communication)
 // Backend can publish to these to control the ESP32
+#define TOPIC_CONTROL_FAN   "panel/" PANEL_ID "/control/fan"
 #define TOPIC_CONTROL_RESET "panel/" PANEL_ID "/control/reset"
 
 

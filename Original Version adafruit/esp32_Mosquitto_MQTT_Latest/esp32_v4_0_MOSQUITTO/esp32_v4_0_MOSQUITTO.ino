@@ -238,7 +238,17 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   Serial.println(message);
   
   // Handle control messages from backend (future feature)
-  // remote reset control
+  // Example: Backend sends "ON" to panel/1/control/fan
+  if (String(topic) == TOPIC_CONTROL_FAN) {
+    if (message == "ON") {
+      digitalWrite(MOTOR_PIN, HIGH);
+      Serial.println("[MQTT] Remote command: Fan ON");
+    } else if (message == "OFF") {
+      digitalWrite(MOTOR_PIN, LOW);
+      Serial.println("[MQTT] Remote command: Fan OFF");
+    }
+  }
+  
   if (String(topic) == TOPIC_CONTROL_RESET) {
     if (message == "RESET") {
       Serial.println("[MQTT] Remote command: System Reset");
@@ -384,6 +394,7 @@ void setup() {
     Serial.println("   -> " + String(TOPIC_DOOR_STATUS));
     Serial.println("   -> " + String(TOPIC_FAN_STATUS));
     Serial.println("   -> " + String(TOPIC_ALARM_STATUS));
+    Serial.println("   <- " + String(TOPIC_CONTROL_FAN) + " (subscribe)");
     Serial.println("   <- " + String(TOPIC_CONTROL_RESET) + " (subscribe)");
   }
   
@@ -503,9 +514,10 @@ void connectMQTT() {
       Serial.println("    User: " + String(MQTT_USER));
       
       // ========================================
-      // NEW: Subscribe to control topic
+      // NEW: Subscribe to control topics
       // ========================================
       // This enables two-way communication (backend → ESP32)
+      mqttClient.subscribe(TOPIC_CONTROL_FAN);
       mqttClient.subscribe(TOPIC_CONTROL_RESET);
       Serial.println("    Subscribed to control topics");
       
