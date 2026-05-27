@@ -16,7 +16,7 @@
 
 // Your Adafruit IO Key (AIO Key)
 // Find it at: https://io.adafruit.com -> My Key (yellow key icon)
-#define AIO_KEY "aio_CvHm45ORULFuq1ZF20DJYcWkRlbN"
+#define AIO_KEY "your_aio_key_here"
 
 // ============================================================================
 // ADAFRUIT IO FEED NAMES
